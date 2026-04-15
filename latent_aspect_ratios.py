@@ -12,6 +12,12 @@ RESOLUTIONS = {
     "WAN Square (512x512)": (512, 512), "WAN Square (768x768)": (768, 768), "WAN Square (960x960)": (960, 960), "WAN Square (1024x1024)": (1024, 1024), "WAN Square (2048x2048)": (2048, 2048), "WAN 16:9 Landscape (1280x720)": (1280, 720), "WAN 9:16 Portrait (720x1280)": (720, 1280), "WAN Portrait (832x1088)": (832, 1088), "WAN Landscape (1088x832)": (1088, 832),
     # ERNIE Resolutions
     "ERNIE Square (1024x1024)": (1024, 1024), "ERNIE Portrait (848x1264)": (848, 1264), "ERNIE Landscape (1264x848)": (1264, 848), "ERNIE Portrait (768x1376)": (768, 1376), "ERNIE Portrait (896x1200)": (896, 1200), "ERNIE Landscape (1376x768)": (1376, 768), "ERNIE Landscape (1200x896)": (1200, 896),
+    # Z-IMAGE Resolutions (1024 Base)
+    "Z-Image 1:1 (1024x1024)": (1024, 1024), "Z-Image 4:3 (1152x864)": (1152, 864), "Z-Image 3:4 (864x1152)": (864, 1152), "Z-Image 3:2 (1248x832)": (1248, 832), "Z-Image 2:3 (832x1248)": (832, 1248), "Z-Image 16:9 (1280x720)": (1280, 720), "Z-Image 9:16 (720x1280)": (720, 1280), "Z-Image 21:9 (1344x576)": (1344, 576), "Z-Image 9:21 (576x1344)": (576, 1344),
+    # Z-IMAGE Resolutions (1280 Base)
+    "Z-Image HD 1:1 (1280x1280)": (1280, 1280), "Z-Image HD 4:3 (1472x1104)": (1472, 1104), "Z-Image HD 3:4 (1104x1472)": (1104, 1472), "Z-Image HD 3:2 (1536x1024)": (1536, 1024), "Z-Image HD 2:3 (1024x1536)": (1024, 1536), "Z-Image HD 16:9 (1536x864)": (1536, 864), "Z-Image HD 9:16 (864x1536)": (864, 1536), "Z-Image HD 21:9 (1680x720)": (1680, 720), "Z-Image HD 9:21 (720x1680)": (720, 1680),
+    # Z-IMAGE Resolutions (1536 Base)
+    "Z-Image XL 1:1 (1536x1536)": (1536, 1536), "Z-Image XL 4:3 (1728x1296)": (1728, 1296), "Z-Image XL 3:4 (1296x1728)": (1296, 1728), "Z-Image XL 3:2 (1872x1248)": (1872, 1248), "Z-Image XL 2:3 (1248x1872)": (1248, 1872), "Z-Image XL 16:9 (2048x1152)": (2048, 1152), "Z-Image XL 9:16 (1152x2048)": (1152, 2048), "Z-Image XL 21:9 (2016x864)": (2016, 864), "Z-Image XL 9:21 (864x2016)": (864, 2016),
 }
 
 class MultiAspectRatio:
@@ -20,11 +26,11 @@ class MultiAspectRatio:
 
     @classmethod
     def INPUT_TYPES(s):
-        # We can now dynamically build the list with separators
+        # Dynamically build the list with separators
         aspect_ratios = [
             "custom",
             "----- FLUX Resolutions -----",
-            *[k for k in RESOLUTIONS if "FLUX" in k or "x" in k and not any(x in k for x in ["Qwen", "SDXL", "WAN", "ERNIE"])],
+            *[k for k in RESOLUTIONS if "FLUX" in k or ("x" in k and not any(x in k for x in ["Qwen", "SDXL", "WAN", "ERNIE", "Z-Image"]))],
             "----- QWEN Resolutions -----",
             *[k for k in RESOLUTIONS if "Qwen" in k],
             "----- SDXL Resolutions -----",
@@ -33,6 +39,8 @@ class MultiAspectRatio:
             *[k for k in RESOLUTIONS if "WAN" in k],
             "----- ERNIE Resolutions -----",
             *[k for k in RESOLUTIONS if "ERNIE" in k],
+            "----- Z-IMAGE Resolutions -----",
+            *[k for k in RESOLUTIONS if "Z-Image" in k],
         ]
         return { "required": { "width": ("INT", {"default": 1024, "min": 64, "max": 8192}), "height": ("INT", {"default": 1024, "min": 64, "max": 8192}), "aspect_ratio": (aspect_ratios,), "swap_dimensions": (["Off", "On"],),"upscale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 100.0, "step":0.1}), "batch_size": ("INT", {"default": 1, "min": 1, "max": 64}) } }
     
