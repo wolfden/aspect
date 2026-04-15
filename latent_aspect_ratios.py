@@ -10,6 +10,8 @@ RESOLUTIONS = {
     "SDXL 1:1 Square (1024x1024)": (1024, 1024), "SDXL Portrait (896x1152)": (896, 1152), "SDXL Portrait (832x1216)": (832, 1216), "SDXL Portrait (768x1344)": (768, 1344), "SDXL Portrait (640x1536)": (640, 1536), "SDXL Landscape (1152x896)": (1152, 896), "SDXL Landscape (1216x832)": (1216, 832), "SDXL Landscape (1344x768)": (1344, 768), "SDXL Landscape (1536x640)": (1536, 640),
     # WAN Resolutions
     "WAN Square (512x512)": (512, 512), "WAN Square (768x768)": (768, 768), "WAN Square (960x960)": (960, 960), "WAN Square (1024x1024)": (1024, 1024), "WAN Square (2048x2048)": (2048, 2048), "WAN 16:9 Landscape (1280x720)": (1280, 720), "WAN 9:16 Portrait (720x1280)": (720, 1280), "WAN Portrait (832x1088)": (832, 1088), "WAN Landscape (1088x832)": (1088, 832),
+    # ERNIE Resolutions
+    "ERNIE Square (1024x1024)": (1024, 1024), "ERNIE Portrait (848x1264)": (848, 1264), "ERNIE Landscape (1264x848)": (1264, 848), "ERNIE Portrait (768x1376)": (768, 1376), "ERNIE Portrait (896x1200)": (896, 1200), "ERNIE Landscape (1376x768)": (1376, 768), "ERNIE Landscape (1200x896)": (1200, 896),
 }
 
 class MultiAspectRatio:
@@ -22,13 +24,15 @@ class MultiAspectRatio:
         aspect_ratios = [
             "custom",
             "----- FLUX Resolutions -----",
-            *[k for k in RESOLUTIONS if "FLUX" in k or "x" in k and "Qwen" not in k and "SDXL" not in k and "WAN" not in k], # A bit complex to keep it compatible
+            *[k for k in RESOLUTIONS if "FLUX" in k or "x" in k and not any(x in k for x in ["Qwen", "SDXL", "WAN", "ERNIE"])],
             "----- QWEN Resolutions -----",
             *[k for k in RESOLUTIONS if "Qwen" in k],
             "----- SDXL Resolutions -----",
             *[k for k in RESOLUTIONS if "SDXL" in k],
             "----- WAN Resolutions -----",
             *[k for k in RESOLUTIONS if "WAN" in k],
+            "----- ERNIE Resolutions -----",
+            *[k for k in RESOLUTIONS if "ERNIE" in k],
         ]
         return { "required": { "width": ("INT", {"default": 1024, "min": 64, "max": 8192}), "height": ("INT", {"default": 1024, "min": 64, "max": 8192}), "aspect_ratio": (aspect_ratios,), "swap_dimensions": (["Off", "On"],),"upscale_factor": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 100.0, "step":0.1}), "batch_size": ("INT", {"default": 1, "min": 1, "max": 64}) } }
     
@@ -38,12 +42,9 @@ class MultiAspectRatio:
     CATEGORY = "My Nodes/Aspect Ratio"
 
     def Aspect_Ratio(self, width, height, aspect_ratio, swap_dimensions, upscale_factor, batch_size):
-        # If a preset is chosen, overwrite the width and height.
-        # Otherwise, the values from the input boxes are used.
         if aspect_ratio in RESOLUTIONS:
             width, height = RESOLUTIONS[aspect_ratio]
         
-        # The swap logic remains the same.
         if swap_dimensions == "On":
             width, height = height, width
             
